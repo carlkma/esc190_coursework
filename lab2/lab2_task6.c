@@ -36,6 +36,6 @@ int main(){
 	*/
 
 	free(ptr);
-	free(p);
+	// free(p);
 
 }
