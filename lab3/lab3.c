@@ -1,13 +1,18 @@
 #include "lab3.h"
+#include <string.h>
 
 //Add TA party item request to the list
-int add_request(struct party_node **head, char *item, double price, char *ta){
-    
+int add_request(struct party_node** head, char *item, double price, char *ta){  
     if (strcmp(item,"IDE") != 0){
     struct party_node* new_node = (struct party_node*) malloc(sizeof(struct party_node));
-    new_node->item = item;
+    new_node->item = (char*) malloc( sizeof (char) * (strlen(item) +1));
+    //new_node->item = item; //str copy
+    strcpy(new_node->item,item);
     new_node->price = price;
-    new_node->ta = ta;
+    new_node->ta = (char*) malloc( sizeof (char)* (strlen(ta) +1));
+
+    //new_node->ta = ta;
+    strcpy(new_node->ta, ta);
     new_node->next = *head;
     *head = new_node;
     return 0;
@@ -22,8 +27,14 @@ int add_request(struct party_node **head, char *item, double price, char *ta){
 
 //Remove the last item added
 void remove_request(struct party_node **head){
+
+    if (*head == NULL){
+        return; // remove request when stack is empty
+    }
     struct party_node* to_remove= *head;
     struct party_node* next = to_remove->next;
+    free(to_remove->item);
+    free(to_remove->ta);
     free(to_remove);
     *head = next;
 
@@ -77,10 +88,15 @@ double finalize_list(struct party_node **head, double budget){
                 // free(current)
             if (current == *head){
                 *head = current->next;
+                free(current->item);
+                free(current->ta);
+                free(current);
                 current = *head;
             }
             else {
                 pre->next = current->next;
+                free(current->item);
+                free(current->ta);
                 free(current);
                 current = current->next;
 
