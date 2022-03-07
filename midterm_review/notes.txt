@@ -1,0 +1,43 @@
+ format specifiers
+  - int: %d
+    - format to X total digits: %.Xd
+      - 999 %.2d => 999
+      - 999 %.3d => 999
+      - 999 %.4d => 0999
+  - float: %f
+    - round to X decimal places: %.Xf
+  - char: %c
+  - string: %s
+  - address: %p
+  
+
+type casting
+
+int a,b,c;
+float d;
+c = a / b; // only int portion kept, i.e. 99/50 = 1.98 => 1
+
+d = (float) a / b; // all data kept
+
+
+#define BOOL int
+#define PI 3.14
+
+
+
+sizeof()
+char: always 1 (byte)
+sizeof other types varies - on my machine:
+int: 4
+
+
+length of array
+int a_length = (int) sizeof(a)/sizeof(a[0]);
+
+2D array
+int matrix[5][9];
+
+int matrix = {{1,2,3,4,5},
+              {6,7,8,9,10}}
+
+

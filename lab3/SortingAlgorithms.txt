@@ -1,0 +1,33 @@
+Sorting Algorithms
+
+Insertion sort
+inserting next element into a sorted sublist
+like bubble sort, where adjacent nodes are swapped
+but every insertion ensures the final correct position 
+    - Best case:  O(n)
+    - Worst case: O(n^2)
+
+Selection sort
+always select the minimum, place in order at beginning 
+    - Best case:  O(n^2)
+    - Worst case: O(n^2)
+
+Bubble sort
+Compare and swap adjacent nodes
+    - Best case:  O(n)
+    - Worst case: O(n^2)
+
+---
+
+Merge sort
+Divide array in halves, recusively
+Sort individual elements, merge()
+    - Best case:  O(nlogn)
+    - Worst case: O(nlogn)
+
+Quick sort
+set pivot as last
+swap leftmost value greater than pivot with rightmost value smaller than pivot
+swap pivot with the greater value once left>right
+    - Best case:  O(nlogn)
+    - Worst case: O(n^2)
