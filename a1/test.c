@@ -183,6 +183,29 @@ Order* dequeue_order(Restaurant* restaurant) {
 	return output_order;
 }
 
+double get_item_cost(char* item_code, Menu* menu) {
+	
+	int i;
+	for (i=0; i<(menu->num_items); i++){
+		if (strcmp(item_code, (menu->item_codes)[i]) == 0) break;
+	}
+	return (menu->item_cost_per_unit)[i];
+
+}
+
+double get_order_subtotal(Order* order, Menu* menu) {
+
+	double subtotal = 0;
+	int i;
+	for (i=0; i<(order->num_items); i++){
+		char *this_item_code = (order->item_codes)[i];
+		int this_item_quantity = (order->item_quantities)[i];
+		subtotal += get_item_cost(this_item_code, menu) * this_item_quantity;
+	}
+
+    return subtotal;
+}
+
 
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");
@@ -208,11 +231,18 @@ void print_order(Order* order){
 
 
 int main() {
-	//Menu *new;
-	//new = load_menu("menu.txt"); 
-	//print_menu(new);
+	
+
+    Menu * m = load_menu ("menu.txt");
+    print_menu(m);
+    Order * o = build_order ("L2B2", "2,1");
+    print_order(o);
+    double asdf = get_order_subtotal (o, m);
+    printf("%f",asdf);
     //Order * order = build_order ("A1B1C1D4", "20,11,17,1");
     //print_order(order);
+
+    /*
 
     Restaurant * restaurant = initialize_restaurant ("McBonalbs");
 Order * order_1 = build_order ("A1B1", "12,13");
@@ -230,4 +260,6 @@ Order * dq_order_1 = dequeue_order ( restaurant );
 print_order(dq_order_1);
 Order * dq_order_2 = dequeue_order ( restaurant );
 print_order(dq_order_2);
+
+*/
 }
