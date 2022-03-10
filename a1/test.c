@@ -207,6 +207,19 @@ double get_order_subtotal(Order* order, Menu* menu) {
 }
 
 
+double get_order_total(Order* order, Menu* menu) {
+	return get_order_subtotal(order, menu) * ((double)TAX_RATE/100+1);
+}
+
+int get_num_completed_orders(Restaurant* restaurant) {
+	return restaurant->num_completed_orders;
+}
+
+int get_num_pending_orders(Restaurant* restaurant) {
+	return restaurant->num_pending_orders;
+}
+
+
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");
 	for (int i = 0; i < menu->num_items; i++){
@@ -232,34 +245,33 @@ void print_order(Order* order){
 
 int main() {
 	
-
-    Menu * m = load_menu ("menu.txt");
-    print_menu(m);
-    Order * o = build_order ("L2B2", "2,1");
-    print_order(o);
-    double asdf = get_order_subtotal (o, m);
-    printf("%f",asdf);
-    //Order * order = build_order ("A1B1C1D4", "20,11,17,1");
-    //print_order(order);
-
-    /*
-
     Restaurant * restaurant = initialize_restaurant ("McBonalbs");
-Order * order_1 = build_order ("A1B1", "12,13");
-print_order(order_1);
-printf("\n");
-Order * order_2 = build_order ("A1B1C1 ", "12,10,9");
-print_order(order_2);
-printf("\n");
-enqueue_order ( order_1 , restaurant );
+    Order * order_1 = build_order ("A1B1", "12,13");
+    Order * order_2 = build_order ("A1B1C1", "12,10,9");
+    int asdf1 = get_num_completed_orders ( restaurant ); // should be 0
+    int asdf2 = get_num_pending_orders ( restaurant ); // should be 0
+    enqueue_order ( order_1 , restaurant );
+    int asdf3 = get_num_completed_orders ( restaurant ); // should be 0
+    int asdf4 = get_num_pending_orders ( restaurant ); // should be 1
+    enqueue_order ( order_2 , restaurant );
+    int asdf5 = get_num_completed_orders ( restaurant ); // should be 0
+    int asdf6 = get_num_pending_orders ( restaurant ); // should be 2
+    Order * dq_order_1 = dequeue_order ( restaurant );
+    int asdf7 = get_num_completed_orders ( restaurant ); // should be 1
+    int asdf8 = get_num_pending_orders ( restaurant ); // should be 1
+    Order * dq_order_2 = dequeue_order ( restaurant );
+    int asdf9 = get_num_completed_orders ( restaurant ); // should be 2
+    int asdf10 = get_num_pending_orders ( restaurant ); // should be 0
 
-enqueue_order ( order_2 , restaurant );
-
-
-Order * dq_order_1 = dequeue_order ( restaurant );
-print_order(dq_order_1);
-Order * dq_order_2 = dequeue_order ( restaurant );
-print_order(dq_order_2);
-
-*/
+    printf("%d\n",asdf1);
+    printf("%d\n",asdf2);
+    printf("%d\n",asdf3);
+    printf("%d\n",asdf4);
+    printf("%d\n",asdf5);
+    printf("%d\n",asdf6);
+    printf("%d\n",asdf7);
+    printf("%d\n",asdf8);
+    printf("%d\n",asdf9);
+    printf("%d\n",asdf10);
+    
 }

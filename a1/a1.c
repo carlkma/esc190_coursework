@@ -216,6 +216,19 @@ double get_order_subtotal(Order* order, Menu* menu) {
 	return subtotal;
 }
 
+double get_order_total(Order* order, Menu* menu) {
+	return get_order_subtotal(order, menu) * ((double)TAX_RATE/100+1);
+}
+
+
+int get_num_completed_orders(Restaurant* restaurant) {
+	return restaurant->num_completed_orders;
+}
+
+int get_num_pending_orders(Restaurant* restaurant) {
+	return restaurant->num_pending_orders;
+}
+
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");
 	for (int i = 0; i < menu->num_items; i++){
