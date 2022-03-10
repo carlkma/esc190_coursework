@@ -96,6 +96,54 @@ Menu* load_menu(char* fname) {
 
 }
 
+Order* build_order(char* items, char* quantities) {
+	Order *new_order;
+	new_order = (Order *) malloc(sizeof(Order));
+
+	int num_unique_item = strlen(items) / (ITEM_CODE_LENGTH - 1);
+   
+
+	char **item_codes_array_for_order;
+	item_codes_array_for_order = (char **) malloc(sizeof(char*) * num_unique_item);
+	int *item_q_array = (int *) malloc(sizeof(int) * num_unique_item);
+
+	int code_idx = 0;
+
+    char *cpy_quantities;
+    cpy_quantities = (char *) calloc(sizeof(char), strlen(quantities)+1);
+    strcpy(cpy_quantities,quantities);
+
+
+	for (int loop=0; loop<num_unique_item; loop++) {
+
+		// Assign item code
+		item_codes_array_for_order[loop] = (char *) calloc(sizeof(char) , (ITEM_CODE_LENGTH));
+		strncpy(item_codes_array_for_order[loop], items, ITEM_CODE_LENGTH-1);
+		items = items + ITEM_CODE_LENGTH-1;
+        //printf("%s\n",item_codes_array_for_order[loop]);
+
+        // Assign item quantities
+		char *item_quantity;
+		if (loop==0) {
+			item_quantity = strtok(cpy_quantities, MENU_DELIM);
+		}
+		else {
+			item_quantity = strtok(NULL, MENU_DELIM);
+		}
+        
+		item_q_array[loop] = atoi(item_quantity);
+        //printf("%d\n",item_q_array[loop]);
+
+
+	}
+    free(cpy_quantities);
+	new_order->num_items = num_unique_item;
+	new_order->item_codes = item_codes_array_for_order;
+	new_order->item_quantities = item_q_array;
+	return new_order;
+	
+}
+
 
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");
