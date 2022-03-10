@@ -144,6 +144,54 @@ Order* build_order(char* items, char* quantities) {
 	
 }
 
+void enqueue_order(Order* order, Restaurant* restaurant) {
+
+	Queue *alias_to_restaurant_queue;
+	alias_to_restaurant_queue = restaurant->pending_orders;
+
+	QueueNode *new_queueNode;
+	new_queueNode = (QueueNode *) malloc(sizeof(QueueNode));
+	new_queueNode->order = order;
+    
+    new_queueNode->next = NULL;
+
+    
+    if (alias_to_restaurant_queue->tail == NULL) {
+        alias_to_restaurant_queue->tail = new_queueNode;
+        alias_to_restaurant_queue->head = new_queueNode;
+    }
+    else {
+	alias_to_restaurant_queue->tail->next = new_queueNode;
+    
+	alias_to_restaurant_queue->tail = new_queueNode;
+    
+    }
+    restaurant->num_pending_orders = restaurant->num_pending_orders + 1;
+}
+
+Order* dequeue_order(Restaurant* restaurant) {
+	Queue *alias_to_restaurant_queue;
+	alias_to_restaurant_queue = restaurant->pending_orders;
+
+	Order *output_order;
+	output_order = (Order *) malloc(sizeof(Order));
+
+	output_order = alias_to_restaurant_queue->head->order;
+	QueueNode *temp_ptr_to_head;
+	temp_ptr_to_head = alias_to_restaurant_queue->head;
+
+    if (alias_to_restaurant_queue->head->next == NULL) alias_to_restaurant_queue->tail = NULL;
+    else alias_to_restaurant_queue->head = alias_to_restaurant_queue->head->next;
+
+	free(temp_ptr_to_head);
+
+    restaurant->num_completed_orders = restaurant->num_completed_orders + 1;
+    restaurant->num_pending_orders = restaurant->num_pending_orders - 1;
+
+	return output_order;
+}
+
+
 
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");

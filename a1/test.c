@@ -1,29 +1,31 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#define MENU_DELIM ","
-#define ITEM_CODE_LENGTH 3
-#define MAX_ITEM_NAME_LENGTH 100
-#define MAX_ITEM_QUANTITY_DIGITS 20
+#include "a1.h"
 #define MAX_PRECISION_DOUBLE 16
 
-#define MENU_DELIM ","
-#define MENU_FNAME "menu.txt"
+Restaurant* initialize_restaurant(char* name) {
 
-#define TAX_RATE 13
-typedef struct Menu {
-	int num_items;
-	char** item_codes; 
-	char** item_names; 
-	double* item_cost_per_unit;
-} Menu;
+	// Initialize restaurant
+	Restaurant *new_restaurant;
+	new_restaurant = (Restaurant *) malloc(sizeof(Restaurant));
 
-typedef struct Order {
-	int num_items;
-	char** item_codes;
-	int* item_quantities;
-} Order;
+	// Restaurant name
+	new_restaurant->name = (char *) malloc(sizeof(char) * MAX_ITEM_NAME_LENGTH);
+	strcpy(new_restaurant->name, name);
 
+	// Restaurant menu
+	new_restaurant->menu = load_menu(MENU_FNAME);
+
+	// Restaurant num orders
+	new_restaurant->num_completed_orders = 0;
+	new_restaurant->num_pending_orders = 0;
+
+	// Restaurant pending_order queue
+	Queue *new_queue;
+	new_queue = (Queue *) malloc(sizeof(Queue));
+	new_queue->head = NULL;
+	new_queue->tail = NULL;
+	new_restaurant->pending_orders = new_queue;
+
+}
 
 Menu* load_menu(char* fname) {
 
@@ -134,6 +136,52 @@ Order* build_order(char* items, char* quantities) {
 	
 }
 
+void enqueue_order(Order* order, Restaurant* restaurant) {
+
+	Queue *alias_to_restaurant_queue;
+	alias_to_restaurant_queue = restaurant->pending_orders;
+
+	QueueNode *new_queueNode;
+	new_queueNode = (QueueNode *) malloc(sizeof(QueueNode));
+	new_queueNode->order = order;
+    
+    new_queueNode->next = NULL;
+
+    
+    if (alias_to_restaurant_queue->tail == NULL) {
+        alias_to_restaurant_queue->tail = new_queueNode;
+        alias_to_restaurant_queue->head = new_queueNode;
+    }
+    else {
+	alias_to_restaurant_queue->tail->next = new_queueNode;
+    
+	alias_to_restaurant_queue->tail = new_queueNode;
+    
+    }
+    restaurant->num_pending_orders = restaurant->num_pending_orders + 1;
+}
+
+Order* dequeue_order(Restaurant* restaurant) {
+	Queue *alias_to_restaurant_queue;
+	alias_to_restaurant_queue = restaurant->pending_orders;
+
+	Order *output_order;
+	output_order = (Order *) malloc(sizeof(Order));
+
+	output_order = alias_to_restaurant_queue->head->order;
+	QueueNode *temp_ptr_to_head;
+	temp_ptr_to_head = alias_to_restaurant_queue->head;
+
+    if (alias_to_restaurant_queue->head->next == NULL) alias_to_restaurant_queue->tail = NULL;
+    else alias_to_restaurant_queue->head = alias_to_restaurant_queue->head->next;
+
+	free(temp_ptr_to_head);
+
+    restaurant->num_completed_orders = restaurant->num_completed_orders + 1;
+    restaurant->num_pending_orders = restaurant->num_pending_orders - 1;
+
+	return output_order;
+}
 
 
 void print_menu(Menu* menu){
@@ -163,6 +211,23 @@ int main() {
 	//Menu *new;
 	//new = load_menu("menu.txt"); 
 	//print_menu(new);
-    Order * order = build_order ("A1B1C1D4", "20,11,17,1");
-    print_order(order);
+    //Order * order = build_order ("A1B1C1D4", "20,11,17,1");
+    //print_order(order);
+
+    Restaurant * restaurant = initialize_restaurant ("McBonalbs");
+Order * order_1 = build_order ("A1B1", "12,13");
+print_order(order_1);
+printf("\n");
+Order * order_2 = build_order ("A1B1C1 ", "12,10,9");
+print_order(order_2);
+printf("\n");
+enqueue_order ( order_1 , restaurant );
+
+enqueue_order ( order_2 , restaurant );
+
+
+Order * dq_order_1 = dequeue_order ( restaurant );
+print_order(dq_order_1);
+Order * dq_order_2 = dequeue_order ( restaurant );
+print_order(dq_order_2);
 }
