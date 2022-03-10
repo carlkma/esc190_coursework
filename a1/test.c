@@ -1,39 +1,23 @@
-#include "a1.h"
-
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define MENU_DELIM ","
+#define ITEM_CODE_LENGTH 3
+#define MAX_ITEM_NAME_LENGTH 100
+#define MAX_ITEM_QUANTITY_DIGITS 20
 #define MAX_PRECISION_DOUBLE 16
 
-/**
-	Add your functions to this file.
-	Make sure to review a1.h.
-	Do NOT include a main() function in this file
-	when you submit.
-*/
+#define MENU_DELIM ","
+#define MENU_FNAME "menu.txt"
 
-Restaurant* initialize_restaurant(char* name) {
+#define TAX_RATE 13
+typedef struct Menu {
+	int num_items;
+	char** item_codes; 
+	char** item_names; 
+	double* item_cost_per_unit;
+} Menu;
 
-	// Initialize restaurant
-	Restaurant *new_restaurant;
-	new_restaurant = (Restaurant *) malloc(sizeof(Restaurant));
-
-	// Restaurant name
-	new_restaurant->name = (char *) malloc(sizeof(char) * MAX_ITEM_NAME_LENGTH);
-	strcpy(new_restaurant->name, name);
-
-	// Restaurant menu
-	new_restaurant->menu = load_menu(MENU_FNAME);
-
-	// Restaurant num orders
-	new_restaurant->num_completed_orders = 0;
-	new_restaurant->num_pending_orders = 0;
-
-	// Restaurant pending_order queue
-	Queue *new_queue;
-	new_queue = (Queue *) malloc(sizeof(Queue));
-	new_queue->head = NULL;
-	new_queue->tail = NULL;
-	new_restaurant->pending_orders = new_queue;
-
-}
 
 Menu* load_menu(char* fname) {
 
@@ -81,7 +65,6 @@ Menu* load_menu(char* fname) {
 
 		//char *item_cost_clean = item_cost+1; // removes first character
   		//item_cost_clean[strlen(item_cost)-1] = '\0'; // removes last character
-		
 		item_cost_array[idx] = strtod(item_cost+1, NULL);
 		idx++;
 	}
@@ -96,7 +79,6 @@ Menu* load_menu(char* fname) {
 
 }
 
-
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");
 	for (int i = 0; i < menu->num_items; i++){
@@ -109,35 +91,8 @@ void print_menu(Menu* menu){
 }
 
 
-void print_order(Order* order){
-	for (int i = 0; i < order->num_items; i++){
-		fprintf(
-			stdout, 
-			"%d x (%s)\n", 
-			order->item_quantities[i], 
-			order->item_codes[i]
-		);
-	}
-}
-
-
-void print_receipt(Order* order, Menu* menu){
-	for (int i = 0; i < order->num_items; i++){
-		double item_cost = get_item_cost(order->item_codes[i], menu);
-		fprintf(
-			stdout, 
-			"%d x (%s)\n @$%.2f ea \t %.2f\n", 
-			order->item_quantities[i],
-			order->item_codes[i], 
-			item_cost,
-			item_cost * order->item_quantities[i]
-		);
-	}
-	double order_subtotal = get_order_subtotal(order, menu);
-	double order_total = get_order_total(order, menu);
-	
-	fprintf(stdout, "Subtotal: \t %.2f\n", order_subtotal);
-	fprintf(stdout, "               -------\n");
-	fprintf(stdout, "Tax %d%%: \t$%.2f\n", TAX_RATE, order_total);
-	fprintf(stdout, "              ========\n");
+int main() {
+	Menu *new;
+	new = load_menu("menu.txt"); 
+	print_menu(new);
 }
