@@ -9,6 +9,31 @@
 	when you submit.
 */
 
+
+int a_isspace(unsigned char c){
+	const char whitespace[] = " \n\t\v\r";
+
+	if (strchr(whitespace, c) == NULL) return 0;
+	return 1;
+}
+
+char *trimwhitespace(char *str) {
+// this function is adapted from stackoverflow
+  char *end;
+
+  // Trim leading space
+  while(a_isspace((unsigned char)*str)) str++;
+
+  // Trim trailing space
+  end = str + strlen(str) - 1;
+  while(end > str && a_isspace((unsigned char)*end)) end--;
+
+  // Write new null terminator character
+  end[1] = '\0';
+
+  return str;
+}
+
 Restaurant* initialize_restaurant(char* name) {
 
 	// Initialize restaurant
@@ -34,7 +59,6 @@ Restaurant* initialize_restaurant(char* name) {
 	new_restaurant->pending_orders = new_queue;
 
 }
-
 Menu* load_menu(char* fname) {
 
 	// Initialize menu
@@ -42,16 +66,21 @@ Menu* load_menu(char* fname) {
 	new_menu = (Menu *) malloc(sizeof(Menu));
 
 	// Initialize menu attributes
-	int count_items = 1;
+	int count_items = 0;
 	
 	// Get number of items
 	FILE *input_file;
 	input_file = fopen(fname, "r");
-	char c;
-	for (c=getc(input_file); c!=EOF; c=getc(input_file)){
-		if (c=='\n') count_items++;
+	char *line;
+	const char whitespace[] = " \n\t\v\r";
+
+	line = (char *) malloc(ITEM_CODE_LENGTH + MAX_ITEM_NAME_LENGTH + MAX_PRECISION_DOUBLE);
+	while (fgets(line, ITEM_CODE_LENGTH + MAX_ITEM_NAME_LENGTH + MAX_PRECISION_DOUBLE, input_file) != NULL) {
+		if (strspn(line,whitespace) != strlen(line)) count_items++;
 	}
+	
 	fclose(input_file);
+	free(line);
 
 	// Continue to initialize menu attributes
 	char **item_codes_array;
@@ -61,31 +90,35 @@ Menu* load_menu(char* fname) {
 	double *item_cost_array = (double *) calloc(sizeof(double) , count_items);
 
 	// Read file line by line
-	char *line;
 	line = (char *) malloc(ITEM_CODE_LENGTH + MAX_ITEM_NAME_LENGTH + MAX_PRECISION_DOUBLE);
-
+	
 	int idx = 0;
 	input_file = fopen(fname, "r");
+
 	while (fgets(line, ITEM_CODE_LENGTH + MAX_ITEM_NAME_LENGTH + MAX_PRECISION_DOUBLE, input_file) != NULL) {
 		
 
 		char *item_code = strtok(line, MENU_DELIM);
 		char *item_name = strtok(NULL, MENU_DELIM);
 		char *item_cost = strtok(NULL, MENU_DELIM);
+		
 
 		item_codes_array[idx] = (char *) calloc(sizeof(char) , ITEM_CODE_LENGTH);
-		strcpy(item_codes_array[idx], item_code);
+		strcpy(item_codes_array[idx], trimwhitespace(item_code));
+		
 
 		item_names_array[idx] = (char *) calloc(sizeof(char) , MAX_ITEM_NAME_LENGTH);
 		strcpy(item_names_array[idx], item_name);
+		
 
 		char *item_cost_clean = item_cost+1; // removes first character
-  		item_cost_clean[strlen(item_cost)-1] = '\0'; // removes last character
+  		//item_cost_clean[strlen(item_cost)-1] = '\0'; // removes last character
 		
 		//item_cost_array[idx] = strtod(item_cost+1, NULL);
 		item_cost_array[idx] = strtod(item_cost_clean, NULL);
-		printf("%f",item_codes_array);
+		
 		idx++;
+		if (idx==count_items) break;
 	}
 
 	fclose(input_file);
@@ -320,3 +353,15 @@ void print_receipt(Order* order, Menu* menu){
 	fprintf(stdout, "Tax %d%%: \t$%.2f\n", TAX_RATE, order_total);
 	fprintf(stdout, "              ========\n");
 }
+
+
+
+/*
+int main() {
+	Menu * menu = load_menu ("menu.txt");
+	
+	print_menu(menu);
+    
+}
+
+*/
