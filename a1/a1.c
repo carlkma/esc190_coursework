@@ -58,7 +58,7 @@ Menu* load_menu(char* fname) {
 	item_codes_array = (char **) malloc(sizeof(char*) * count_items);
 	char **item_names_array;
 	item_names_array = (char **) malloc(sizeof(char*) * count_items);
-	double *item_cost_array = (double *) malloc(sizeof(double) * count_items);
+	double *item_cost_array = (double *) calloc(sizeof(double) , count_items);
 
 	// Read file line by line
 	char *line;
@@ -73,20 +73,23 @@ Menu* load_menu(char* fname) {
 		char *item_name = strtok(NULL, MENU_DELIM);
 		char *item_cost = strtok(NULL, MENU_DELIM);
 
-		item_codes_array[idx] = (char *) malloc(sizeof(char) * ITEM_CODE_LENGTH);
+		item_codes_array[idx] = (char *) calloc(sizeof(char) , ITEM_CODE_LENGTH);
 		strcpy(item_codes_array[idx], item_code);
 
-		item_names_array[idx] = (char *) malloc(sizeof(char) * MAX_ITEM_NAME_LENGTH);
+		item_names_array[idx] = (char *) calloc(sizeof(char) , MAX_ITEM_NAME_LENGTH);
 		strcpy(item_names_array[idx], item_name);
 
-		//char *item_cost_clean = item_cost+1; // removes first character
-  		//item_cost_clean[strlen(item_cost)-1] = '\0'; // removes last character
+		char *item_cost_clean = item_cost+1; // removes first character
+  		item_cost_clean[strlen(item_cost)-1] = '\0'; // removes last character
 		
-		item_cost_array[idx] = strtod(item_cost+1, NULL);
+		//item_cost_array[idx] = strtod(item_cost+1, NULL);
+		item_cost_array[idx] = strtod(item_cost_clean, NULL);
+		printf("%f",item_codes_array);
 		idx++;
 	}
 
 	fclose(input_file);
+	free(line);
 	new_menu->num_items = count_items;
 	new_menu->item_codes = item_codes_array;
 	new_menu->item_names = item_names_array;
@@ -228,6 +231,50 @@ int get_num_completed_orders(Restaurant* restaurant) {
 int get_num_pending_orders(Restaurant* restaurant) {
 	return restaurant->num_pending_orders;
 }
+
+void clear_order(Order** order) {
+	for (int i=0; i<(*order)->num_items; i++){
+		free(((*order)->item_codes)[i]);
+	}
+	free((*order)->item_codes);
+	free((*order)->item_quantities);
+	free(*order);
+	*order = NULL;
+}
+
+void clear_menu(Menu** menu) {
+
+
+	for (int i=0; i<(*menu)->num_items; i++){
+		free(((*menu)->item_codes)[i]);
+		free(((*menu)->item_names)[i]);
+	}
+	free((*menu)->item_codes);
+	free((*menu)->item_names);
+	free((*menu)->item_cost_per_unit);
+	free(*menu);
+	*menu = NULL;
+}
+
+
+void close_restaurant(Restaurant** restaurant){
+
+	clear_menu(&((*restaurant)->menu));
+
+	QueueNode *temp = ((*restaurant)->pending_orders)->head;
+	while ( temp != NULL){
+		clear_order(&(temp->order));
+		temp = temp->next;
+	}
+	free(((*restaurant)->pending_orders)->head);
+	free(((*restaurant)->pending_orders)->tail);
+	free((*restaurant)->pending_orders);
+	
+	free((*restaurant)->name);
+	free(*restaurant);
+	*restaurant = NULL;
+}
+
 
 void print_menu(Menu* menu){
 	fprintf(stdout, "--- Menu ---\n");
