@@ -286,7 +286,10 @@ Order* dequeue_order(Restaurant* restaurant) {
 	QueueNode *temp_ptr_to_head;
 	temp_ptr_to_head = alias_to_restaurant_queue->head;
 
-    if (alias_to_restaurant_queue->head->next == NULL) alias_to_restaurant_queue->tail = NULL;
+    if (alias_to_restaurant_queue->head->next == NULL) {
+		alias_to_restaurant_queue->head = NULL;
+		alias_to_restaurant_queue->tail = NULL;
+	}
     else alias_to_restaurant_queue->head = alias_to_restaurant_queue->head->next;
 
 	free(temp_ptr_to_head);
