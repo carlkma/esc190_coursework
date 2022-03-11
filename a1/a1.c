@@ -412,7 +412,7 @@ void close_restaurant(Restaurant** restaurant){
 		clear_order(&(temp->order));
 		temp = temp->next;
 	}
-	free(((*restaurant)->pending_orders)->head);
+	if (((*restaurant)->pending_orders)->head != ((*restaurant)->pending_orders)->tail) free(((*restaurant)->pending_orders)->head);
 	free(((*restaurant)->pending_orders)->tail);
 	free((*restaurant)->pending_orders);
 	
