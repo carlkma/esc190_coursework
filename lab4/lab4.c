@@ -75,16 +75,16 @@ PlayerRecord* add_match(
 		new_playerRecord->right_child = p2;
 		new_playerRecord->player = p2->player;
 
-		new_playerRecord->game_records[WINS] = p2->game_records[WINS] + p2_wins;
-		new_playerRecord->game_records[LOSSES] = p2->game_records[LOSSES] + p1_wins;
+		new_playerRecord->game_records[WINS] = p2_wins;
+		new_playerRecord->game_records[LOSSES] = p1_wins;
 	}
 	else{
 		new_playerRecord->left_child = p2;
 		new_playerRecord->right_child = p1;
 		new_playerRecord->player = p1->player;
 
-		new_playerRecord->game_records[WINS] = p1->game_records[WINS] + p1_wins;
-		new_playerRecord->game_records[LOSSES] = p1->game_records[LOSSES] + p2_wins;
+		new_playerRecord->game_records[WINS] = p1_wins;
+		new_playerRecord->game_records[LOSSES] = p2_wins;
 	}
 
 	return new_playerRecord;
