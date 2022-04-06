@@ -9,6 +9,7 @@ Test submission, to be updated
 ----------------------------------------*/
 
 #include "lab5.h"
+#define INT_MAX 2147483647
 
 
 int get_vertex_index_by_name(Graph *gr, char* name){
@@ -49,6 +50,7 @@ char **plan_route(Graph *gr, char *start, char *dest){
 
     int start_index = -1;
     int dest_index = -1;
+
 
     // loop thru adj_list once, init optional var
     for (int i=0; i<(gr->count); i++){
@@ -115,7 +117,7 @@ char **plan_route(Graph *gr, char *start, char *dest){
     
 
     int end = 0;
-    for (int out_index=0; out_index<(gr->count); out_index++){
+    for (int out_index=0; out_index<=(gr->count); out_index++){
         if (end==0){
             char *to_add;
             to_add = (char*) malloc(sizeof(char) * MAX_LEN);
@@ -123,7 +125,8 @@ char **plan_route(Graph *gr, char *start, char *dest){
             (output_sequence[out_index]) = to_add;
         }
         else{
-            return output_sequence;
+            if (strcmp(start, (output_sequence[out_index-1]))==0) return output_sequence;
+            else return NULL;
         }
         if ((gr->adj_list)[dest_index]->prev != NULL){
             dest_index = get_vertex_index_by_name(gr, (gr->adj_list)[dest_index]->prev->station);
@@ -265,6 +268,7 @@ void disrupt(Graph *gr, char *station){
     // aka remove this node from (gr->adj_list) and free
     Enode *edge_node_arr_to_free = (gr->adj_list)[del_index]->edges;
     free_linked_list(edge_node_arr_to_free);
+    free((gr->adj_list)[del_index]);
 
     // shift remaining list items one step forward
     gr->count = (gr->count) - 1;
