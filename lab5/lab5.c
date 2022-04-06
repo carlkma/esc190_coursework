@@ -1,57 +1,59 @@
+/*----------------------------------------
+ESC190 Lab 5
+Apr 6, 2022
+
+Ma, Carl Ka To
+Xu, Shenxiaozhu
+
+Test submission, to be updated
+----------------------------------------*/
+
 #include "lab5.h"
 
+
 int get_vertex_index_by_name(Graph *gr, char* name){
+    // helper function to get index of vertex <name> in gr->adj_list
+    // loop thru gr->adj_list, return index if name matches 
 
-    int count_vertices = gr->count;
-    Vnode **arr_vertices = gr->adj_list;
-
-    for (int i=0; i<count_vertices; i++){
-        if (strcmp(arr_vertices[i]->station, name) == 0) return i;
+    for (int i=0; i<(gr->count); i++){
+        if (strcmp((gr->adj_list)[i]->station, name) == 0) return i;
     }
-    return -1;
+    return -1; // -1 if nonexistent
 }
 
-int get_vertex_index_by_lowest_cost(Graph *gr){
 
-    int count_vertices = gr->count;
-    Vnode **arr_vertices = gr->adj_list;
-    
+int get_vertex_index_by_lowest_cost(Graph *gr){
+    // helper function to get index of vertex with lowest cost in gr->adj_list
+    // loop thru gr->adj_list, ignore visited vertices
+
     int temp_min = INT_MAX;
     int temp_min_index = -1;
 
-    for (int i=0; i<count_vertices; i++){
-        if (arr_vertices[i]->visited == 1) continue;
-        if (arr_vertices[i]->cost < temp_min){
-            temp_min = arr_vertices[i]->cost;
+    for (int i=0; i<(gr->count); i++){
+        if ((gr->adj_list)[i]->visited == 1) continue;
+        if ((gr->adj_list)[i]->cost < temp_min){
+            temp_min = (gr->adj_list)[i]->cost;
             temp_min_index = i;
         }
     }
     return temp_min_index;
-
 }
 
+
 char **plan_route(Graph *gr, char *start, char *dest){
-    
-    // define local var from Graph *gr
-    int count_vertices = gr->count;
-    Vnode **arr_vertices = (gr->adj_list);
 
     // define output array of strings
     char **output_sequence;
-    // max length of seq is count_vertices
-    output_sequence = (char**) calloc(sizeof(char*) , count_vertices);
-
-    //char *(output_sequence[0]);
-    //output_sequence[0] = (char*) malloc(sizeof(char)*MAX_LEN);
-   
+    // max length of seq is (gr->count)
+    output_sequence = (char**) calloc(sizeof(char*), (gr->count));
 
     int start_index = -1;
     int dest_index = -1;
 
     // loop thru adj_list once, init optional var
-    for (int i=0; i<count_vertices; i++){
-        if (strcmp(arr_vertices[i]->station, start) == 0) start_index=i; 
-        if (strcmp(arr_vertices[i]->station, dest) == 0) dest_index=i;
+    for (int i=0; i<(gr->count); i++){
+        if (strcmp((gr->adj_list)[i]->station, start) == 0) start_index=i; 
+        if (strcmp((gr->adj_list)[i]->station, dest) == 0) dest_index=i;
 
         (gr->adj_list)[i]->visited = 0;
         (gr->adj_list)[i]->prev = NULL;
@@ -80,7 +82,7 @@ char **plan_route(Graph *gr, char *start, char *dest){
 
             // get name of adjacent node
             char *temp_vertex_name = arr_edges->vertex;
-            //printf("name of current %s\n", arr_vertices[current_index]->station);
+            //printf("name of current %s\n", (gr->adj_list)[current_index]->station);
             //printf("name of adj %s\n",temp_vertex_name);
 
             // get index of adjacent node in the primary array, adj_list
@@ -90,10 +92,9 @@ char **plan_route(Graph *gr, char *start, char *dest){
             if (temp_vertex_index==-1) return NULL;
 
             // modify cost associated with adjacent node, if appropriate
-            int old_cost = arr_vertices[temp_vertex_index]->cost;
-            int new_cost = arr_vertices[current_index]->cost + arr_edges->weight;
+            int old_cost = (gr->adj_list)[temp_vertex_index]->cost;
+            int new_cost = (gr->adj_list)[current_index]->cost + arr_edges->weight;
 
-            
             //printf("%d\n",new_cost);
             //printf("%d\n",old_cost);
 
@@ -113,30 +114,25 @@ char **plan_route(Graph *gr, char *start, char *dest){
     // adj_list is now complete with data
     
 
-    int out_vertex_index = get_vertex_index_by_name(gr, dest);
     int end = 0;
-    for (int out_index=0; out_index<count_vertices; out_index++){
+    for (int out_index=0; out_index<(gr->count); out_index++){
         if (end==0){
             char *to_add;
             to_add = (char*) malloc(sizeof(char) * MAX_LEN);
-            strcpy(to_add, (gr->adj_list)[out_vertex_index]->station);
+            strcpy(to_add, (gr->adj_list)[dest_index]->station);
             (output_sequence[out_index]) = to_add;
-            
         }
         else{
             return output_sequence;
         }
-        if ((gr->adj_list)[out_vertex_index]->prev != NULL){
-            out_vertex_index = get_vertex_index_by_name(gr, (gr->adj_list)[out_vertex_index]->prev->station);
+        if ((gr->adj_list)[dest_index]->prev != NULL){
+            dest_index = get_vertex_index_by_name(gr, (gr->adj_list)[dest_index]->prev->station);
         }
         else{
             end = 1;
         }
-    
-
     }
     return NULL;
-
 }
 
 void add(Graph *gr, char *station){
@@ -180,13 +176,6 @@ Enode* delete_node(Enode *head, char *to_delete){
 }
 
 void update(Graph *gr, char *start, char *dest, int weight){
-    
-
-    // define local var from Graph *gr
-    int count_vertices = gr->count;
-    Vnode **arr_vertices = gr->adj_list;
-
-    
 
     int start_index = get_vertex_index_by_name(gr, start);
     int dest_index = get_vertex_index_by_name(gr, dest);
@@ -197,7 +186,7 @@ void update(Graph *gr, char *start, char *dest, int weight){
         // case 1.1: start and/or dest nonexistent
         if (start_index==-1 || dest_index==-1) return;
         // case 1.2: start and dest exist, remove edge from start to dest
-        arr_vertices[start_index]->edges = delete_node(arr_vertices[start_index]->edges, dest);
+        (gr->adj_list)[start_index]->edges = delete_node((gr->adj_list)[start_index]->edges, dest);
         return;
     }
 
@@ -268,9 +257,6 @@ void disrupt(Graph *gr, char *station){
     
     // no action if station does not exist
     if (get_vertex_index_by_name(gr, station) == -1) return;
-
-    // define local var from Graph *gr
-    int count_vertices = (gr->count);
 
     // get index of vertex to delete
     int del_index = get_vertex_index_by_name(gr, station);
