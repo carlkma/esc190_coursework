@@ -1,3 +1,11 @@
+/*----------------------------------------
+ESC190 Assignment 2
+Apr 11, 2022
+Ma, Carl Ka To
+Xu, Shenxiaozhu
+V1.6 test submission, to be updated
+----------------------------------------*/
+
 #include "a2.h"
 #define MAX_MSG_LENGTH 37 // 256/7=36.6
 
@@ -24,24 +32,24 @@ int bitwise_xor(int value){
 
 char *xor_encrypt(char c){
     int num = bitwise_xor(c);
-
     char *new_string;
     new_string = (char*) malloc(sizeof(char) * 8);
     new_string[7] = '\0';
 
     for (int i=6; i>=0; i--){
-        new_string[i] = num % 2;
+        new_string[i] = (num % 2) + '0';
         num /= 2;
     }
-
     return new_string;
 }
 
 char xor_decrypt(char *s){
+
     int num = 0;
     for (int i=6; i>=0; i--){
-        num += s[i] * pow(2, 6-i);
+        num += (s[i]-48) * pow(2, 6-i);
     }
+    
     return bitwise_xor(num);
 }
 
@@ -112,12 +120,12 @@ void insert_bits_to_code(char* bits, char** ptr_code, int* current_index){
 char *gen_code(char *msg){
     char *new_code;
     int current_index = 5;
-    new_code = (char*) calloc(sizeof(char) , 257);
+    new_code = (char*) malloc(sizeof(char) * 257);
 
     for (int i=0; i<256; i++){
-        //new_code[i] = 0;
-        if (is_forbidden(i)) new_code[i] = 1;
-        if (is_forbidden_but_white(i)) new_code[i] = 0;
+        new_code[i] = '0';
+        if (is_forbidden(i)) new_code[i] = '1';
+        if (is_forbidden_but_white(i)) new_code[i] = '0';
     }
 
     new_code[256] = '\0';
@@ -128,9 +136,12 @@ char *gen_code(char *msg){
         
         
         insert_bits_to_code(the_char_in_bits, &new_code, &current_index);
+        free(the_char_in_bits);
         msg++;
     }
-    insert_bits_to_code(xor_encrypt('\0'),&new_code, &current_index);
+    char *ending = xor_encrypt('\0');
+    insert_bits_to_code(ending,&new_code, &current_index);
+    free(ending);
     return new_code;
 
 
@@ -150,10 +161,10 @@ char *read_code(char *code){
             current_index = increment(current_index);
         }
         char c = xor_decrypt(new_string);
+        free(new_string);
         
         message[msg_index] = c;
         if (c=='\0') {
-            free(new_string);
             break;
         }
 
@@ -166,12 +177,10 @@ char *compress(char *code){
     hex_output = (char*) malloc(sizeof(char) * 65);
     for (int i=0; i<=252; i+=4){
         int hex = 0;
-        hex += code[i] * 8;
-        hex += code[i+1] * 4;
-        hex += code[i+2] * 2;
-        hex += code[i+3] * 1;
-
-        printf("now index is %d, and %d \n", i, hex);
+        hex += (code[i] - '0') * 8;
+        hex += (code[i+1] - '0') * 4;
+        hex += (code[i+2] - '0') * 2;
+        hex += (code[i+3] - '0') * 1;
 
         if (hex<10){
             hex_output[i/4] = hex + '0';
@@ -197,7 +206,7 @@ char *decompress(char *code){
         
         char hex = code[i];
         int dec = 0;
-        dec = hex;
+        dec = hex - 48;
         if (hex=='A') dec=10;
         if (hex=='B') dec=11;
         if (hex=='C') dec=12;
@@ -216,16 +225,77 @@ char *decompress(char *code){
 
 }
 
-
-int calc_ld(char *sandy, char *cima){
-    //add code here
+int get_length(char *arr){
+    int length = 0;
+    if (arr==NULL) return length;
+    while (*arr != '\0'){
+        length++;
+        arr++;
+    }
+    return length;
 }
 
+int get_min(int a1, int b1, int c1){
+    int temp_min = 2147483647;
+    if (a1<temp_min) temp_min=a1;
+    if (b1<temp_min) temp_min=b1;
+    if (c1<temp_min) temp_min=c1;
+    return temp_min;
+}
 
+int calc_ld(char *sandy, char *cima){
 
+    if (sandy==NULL || *sandy=='\0') return get_length(cima);
+    if (cima==NULL || *cima=='\0') return get_length(sandy);
 
+    if (sandy[0]==cima[0]){
+        char *new_sandy0, *new_cima0;
+        new_sandy0 = sandy+1;
+        new_cima0 = cima+1;
+        return calc_ld(new_sandy0, new_cima0);
+    }
+    else{
+        
+        char *new_sandy1, *new_cima1;
+        char *new_sandy2, *new_cima2;
+        char *new_sandy3, *new_cima3;
+
+        new_sandy1 = sandy+1;
+        new_cima1 = cima;
+
+        new_sandy2 = sandy;
+        new_cima2 = cima+1;
+
+        new_sandy3 = sandy+1;
+        new_cima3 = cima+1;
+
+        // case 1
+        int case1 = calc_ld(new_cima1, new_sandy1);
+        // case 2
+        int case2 = calc_ld(new_cima2, new_sandy2);
+        // case 3
+        int case3 = calc_ld(new_cima3, new_sandy3);
+
+        return 1+get_min(case1,case2,case3);
+    }
+}
+
+/*
 int main(){
 
+    char *task1 = xor_encrypt('A');
+    //printf("%s", task1);
+
+    int asdf = 499/10;
+    printf("%d", asdf);
+    exit(1);
+
+
+
+    char c = xor_decrypt(task1);
+    //printf("Decrypted is %c", c);
+    exit(1);
+    
     char *test_string = "Program in C!";
     char *result = gen_code(test_string);
     print_code(result);
@@ -239,6 +309,14 @@ int main(){
     printf("%s", result3);
     printf("\n");
     printf("%s", result);
- 
-    return 0;
+    
+
+   // Task 4 test
+   int answer = calc_ld("COMMENCE","CODING");
+   answer = calc_ld("COMMENCE","PROCRASTINATING");
+   printf("%d", answer);
+   
+   
+   return 0;
 }
+*/
